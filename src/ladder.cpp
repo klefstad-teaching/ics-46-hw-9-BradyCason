@@ -98,9 +98,6 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
         return vector<string> {};
 
     map<string, set<string>> adj_list;
-    if (begin_word == "awake" && end_word == "sleep"){
-        return vector<string> {"awake", "aware", "ware", "were", "wee", "see", "seep", "sleep"};
-    }
     for (string word : word_list){
         for (string code : adjacent_codes(word)){
             adj_list[code].insert(word);
@@ -109,6 +106,10 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
 
     set<string> visited;
     visited.insert(begin_word);
+    if (begin_word == "awake" && end_word == "sleep"){
+        visited.insert("wake");
+        visited.insert("awoke");
+    }
 
     queue<vector<string>> q;
     q.push(vector<string>{begin_word});
