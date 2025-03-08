@@ -5,11 +5,8 @@
 void error(string word1, string word2, string msg){
     cerr << "Error: (" << word1 << ", " << word2 << "): " << msg << endl;
 }
-bool edit_distance_within(const std::string& str1, const std::string& str2, int d){
-    return false;
-}
-bool is_adjacent(const string& word1, const string& word2){
-    bool found_dif = false;
+bool edit_distance_within(const std::string& word1, const std::string& word2, int d){
+    int num_dif = 0;
     if (word1.size() == word2.size() + 1 || word1.size() + 1 == word2.size()){
         int i = 0;
         int j = 0;
@@ -19,9 +16,9 @@ bool is_adjacent(const string& word1, const string& word2){
                 ++j;
             }
             else{
-                if (found_dif)
+                if (num_dif >= d)
                     return false;
-                found_dif = true;
+                ++num_dif;
 
                 if (word1.size() > word2.size())
                     ++i;
@@ -34,18 +31,21 @@ bool is_adjacent(const string& word1, const string& word2){
     else if (word1.size() == word2.length()){
         for(int i = 0; i < word1.length(); ++i){
             if (word1[i] != word2[i]){
-                if (found_dif)
+                if (num_dif >= d)
                     return false;
-                found_dif = true;
+                ++num_dif;
             }
         }
-        return found_dif;
+        return true;
     }
     return false;
 }
+bool is_adjacent(const string& word1, const string& word2){
+    return edit_distance_within(word1, word2, 1);
+}
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list){
     if (begin_word == end_word)
-        return vector<string> {begin_word};
+        return vector<string> {};
 
     queue<vector<string>> q;
     q.push(vector<string>{begin_word});
@@ -82,9 +82,16 @@ void load_words(set<string> & word_list, const string& file_name){
     }
 }
 void print_word_ladder(const vector<string>& ladder){
+    if(ladder.size() > 0){
+        cout << "No word ladder found." << endl;
+        return;
+    }
+
+    cout << "Word ladder found: ";
     for (string s : ladder){
         cout << s << ' ';
     }
+    cout << endl;
 }
 
 #define my_assert(e) {cout << #e << ((e) ? " passed": " failed") << endl;}
