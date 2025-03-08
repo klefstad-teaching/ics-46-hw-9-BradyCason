@@ -80,7 +80,8 @@ vector<string> adjacent_codes(const string& word){
         code = word;
         code[i] = '*';
         ret.push_back(code);
-
+    }
+    for(int i = 0; i < word.length(); ++i){
         code = word;
         code.insert(i, 1, '*');
         ret.push_back(code);
