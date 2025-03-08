@@ -43,23 +43,79 @@ bool edit_distance_within(const std::string& word1, const std::string& word2, in
 bool is_adjacent(const string& word1, const string& word2){
     return edit_distance_within(word1, word2, 1);
 }
+// vector<string> generate_word_ladder_v1(const string& begin_word, const string& end_word, const set<string>& word_list){
+//     if (begin_word == end_word)
+//         return vector<string> {};
+
+//     queue<vector<string>> q;
+//     q.push(vector<string>{begin_word});
+
+//     set<string> visited;
+//     visited.insert(begin_word);
+
+//     while(!q.empty()){
+//         vector<string> ladder = q.front();
+//         q.pop();
+
+//         for (string word : word_list){
+//             if (is_adjacent(word, ladder.back())){
+//                 if (visited.find(word) == visited.end()){
+//                     visited.insert(word);
+//                     vector<string> new_ladder = ladder;
+//                     new_ladder.push_back(word);
+//                     if (word == end_word)
+//                         return new_ladder;
+//                     q.push(new_ladder);
+//                 }
+//             }
+//         }
+//     }
+//     return vector<string> {};
+// }
+
+vector<string> adjacent_codes(const string& word){
+    vector<string> ret;
+    string code;
+    for(int i = 0; i < word.length(); ++i){
+        code = word;
+        code[i] = '*';
+        ret.push_back(code);
+
+        code = word;
+        code.insert(i, 1, '*');
+        ret.push_back(code);
+    }
+    code = word;
+    code.push_back('*');
+    ret.push_back(code);
+
+    return ret;
+} 
+
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list){
     if (begin_word == end_word)
         return vector<string> {};
 
-    queue<vector<string>> q;
-    q.push(vector<string>{begin_word});
+    map<string, set<string>> adj_list;
+    for (string word : word_list){
+        for (string code : adjacent_codes(word)){
+            adj_list[code].insert(word);
+        }
+    }
 
     set<string> visited;
     visited.insert(begin_word);
+
+    queue<vector<string>> q;
+    q.push(vector<string>{begin_word});
 
     while(!q.empty()){
         vector<string> ladder = q.front();
         q.pop();
 
-        for (string word : word_list){
-            if (is_adjacent(word, ladder.back())){
-                if (visited.find(word) == visited.end()){
+        for (string code : adjacent_codes(ladder.back())){
+            for (string word : adj_list[code]){
+                if (word != ladder.back() && visited.find(word) == visited.end()){
                     visited.insert(word);
                     vector<string> new_ladder = ladder;
                     new_ladder.push_back(word);
@@ -72,6 +128,8 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
     }
     return vector<string> {};
 }
+
+
 void load_words(set<string> & word_list, const string& file_name){
     ifstream in(file_name);
     string word;
